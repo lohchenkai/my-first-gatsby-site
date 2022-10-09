@@ -4,13 +4,16 @@ import Seo from "../components/seo";
 import { graphql } from "gatsby";
 
 export default function Blog({ data }) {
-  const blogList = data.allFile.nodes.map((blogName, index) => (
-    <h3 key={index}>{blogName.name}</h3>
+  const blogList = data.allMdx.nodes.map( blog => (
+    <article key={blog.id}>
+      <h2>{blog.frontmatter.title}</h2>
+      <h5>Posted: {blog.frontmatter.date}</h5>
+      <p>{blog.excerpt}</p>
+    </article>
   ));
 
   return (
     <Layout pageTitle="My Blog Posts">
-      <h2>A List Of My Blog Post</h2>
       {blogList}
     </Layout>
   );
@@ -18,9 +21,14 @@ export default function Blog({ data }) {
 
 export const query = graphql`
   query {
-    allFile(filter: { sourceInstanceName: { eq: "blog" } }) {
+    allMdx(sort: {fields: frontmatter___date, order: DESC}) {
       nodes {
-        name
+        frontmatter {
+          date(formatString: "MMMM D, YYYY")
+          title
+        }
+        id
+        excerpt
       }
     }
   }
